@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Request, Depends, Form, HTTPException
 from sqlalchemy.orm import Session
 from app.database import get_db
-from app.models import Contribution, ContributionStatus, Review
+from app.models import Contribution, ContributionStatus, Review,User
 from app.main import templates
 
 router = APIRouter(prefix="/review", tags=["review"])
@@ -17,7 +17,8 @@ def review_dashboard(request: Request, db: Session = Depends(get_db)):
 
 
 @router.post("/decision")
-def submit_review(contribution_id: int = Form(...), decision: str = Form(...), comment: str = Form(None), db: Session = Depends(get_db)):
+def submit_review(request: Request,contribution_id: int = Form(...), decision: str = Form(...), comment: str = Form(None), db: Session = Depends(get_db)):
+    user = request.session.get("user")
     contribution = db.query(Contribution).filter(Contribution.id == contribution_id).first()
     if not contribution:
         raise HTTPException(status_code=404, detail="Contribution not found")
@@ -30,4 +31,6 @@ def submit_review(contribution_id: int = Form(...), decision: str = Form(...), c
     review = Review(contribution_id=contribution.id, reviewer_id=1, decision=decision, comment=comment)
     db.add(review)
     db.commit()
-    return {"status": "ok"}
+    pending = db.query(Contribution).filter(Contribution.status == ContributionStatus.pending).all()
+    return templates.TemplateResponse(request=request, name="review.html", context={"current_user": user, "pending": pending})
+

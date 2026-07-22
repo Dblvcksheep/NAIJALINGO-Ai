@@ -1,27 +1,107 @@
 {% extends "base.html" %}
-{% block heading %}Review queue{% endblock %}
+
+{% block heading %}
+Review Queue
+{% endblock %}
+
 {% block content %}
+
 <section class="card">
-  <h2>Review dashboard</h2>
-  <p>Pending items are shown here for expert review. AI suggestions are visible but never replace reviewer judgment.</p>
+  <div class="page-header">
+    <h2>Review Dashboard</h2>
+    <p>
+      Review pending contributions below. AI suggestions are provided only as
+      guidance and should never replace your judgment.
+    </p>
+  </div>
+
+  {% if pending %}
+
   {% for item in pending %}
+
   <article class="review-item">
-    <h3>From:{{ item.source_text }} · To:{{ item.translated_text }}</h3>
-    <p>AiSummary: {{ item.ai_analysis.summary or 'No explanation provided.' }}</p>
-    <p>AiConfidence: {{ item.ai_analysis.confidence or 'failed to fetch confidence'}}
-    <p>Landuage: {{ item.language }}
-    <form method="post" action="/review/decision">
+
+    <div class="review-header">
+      <h3>{{ item.source_text }} → {{ item.translated_text }}</h3>
+
+      <span class="status pending">
+        {{ item.status.value|title }}
+      </span>
+    </div>
+
+    <div class="review-details">
+
+      <p>
+        <strong>Language:</strong>
+        {{ item.language.name }}
+      </p>
+
+      <p>
+        <strong>Contribution Type:</strong>
+        {{ item.type.value|title }}
+      </p>
+
+      <p>
+        <strong>AI Summary:</strong>
+        {% if item.ai_analysis %}
+        {{ item.ai_analysis.summary or "No summary available." }}
+        {% else %}
+        No AI analysis available.
+        {% endif %}
+      </p>
+
+      <p>
+        <strong>AI Confidence:</strong>
+        {% if item.ai_analysis %}
+        {{ item.ai_analysis.confidence or "Unknown" }}
+        {% else %}
+        N/A
+        {% endif %}
+      </p>
+
+    </div>
+
+    <form method="POST" action="/review/decision" class="review-form">
+
       <input type="hidden" name="contribution_id" value="{{ item.id }}">
-      <label for="decision">Decision</label>
-      <select name="decision">
-        <option value="approve">Approve</option>
-        <option value="reject">Reject</option>
-      </select>
-      <label for="comment">Comment</label>
-      <textarea name="comment"></textarea>
-      <button class="button primary" type="submit">Submit review</button>
+
+      <div class="form-group">
+        <label for="decision">Decision</label>
+
+        <select name="decision" id="decision" required>
+          <option value="approve">✅ Approve</option>
+          <option value="reject">❌ Reject</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label for="comment">Reviewer Comment</label>
+
+        <textarea name="comment" id="comment" rows="4"
+          placeholder="Provide feedback or reason for your decision..."></textarea>
+      </div>
+
+      <button type="submit" class="button primary">
+        Submit Review
+      </button>
+
     </form>
+
   </article>
+
   {% endfor %}
+
+  {% else %}
+
+  <div class="empty-state">
+    <h3>🎉 Review Queue is Empty</h3>
+    <p>
+      There are currently no pending contributions awaiting review.
+    </p>
+  </div>
+
+  {% endif %}
+
 </section>
+
 {% endblock %}

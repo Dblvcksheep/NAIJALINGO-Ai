@@ -49,6 +49,11 @@ class Language(Base):
     region = Column(String(255), nullable=False)
     family = Column(String(255), nullable=False)
     created_at = Column(DateTime(timezone=True), server_default=func.now())
+    contribution = relationship(
+        "Contribution",
+        back_populates="language",
+        uselist=False,
+    )
 
 
 class Contribution(Base):
@@ -74,6 +79,12 @@ class Contribution(Base):
         back_populates="contribution",
         uselist=False,
     )
+    language = relationship(
+        "Language",
+        back_populates="contribution",
+        uselist=False,
+    )
+    
 
 
 class AIAnalysis(Base):
