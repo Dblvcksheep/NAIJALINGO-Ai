@@ -3,7 +3,7 @@ from sqlalchemy.orm import Session
 from app.database import get_db
 from fastapi.templating import Jinja2Templates
 from app.main import templates
-from app.models import Contribution, ContributionStatus
+from app.models import Contribution, ContributionStatus, User
 
 
 router = APIRouter(tags=["dashboard"])

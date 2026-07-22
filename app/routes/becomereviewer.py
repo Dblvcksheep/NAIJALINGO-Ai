@@ -1,12 +1,14 @@
 from fastapi import APIRouter, Request, Depends, Form, HTTPException
 from sqlalchemy.orm import Session
-from app.models import BecomeReviewer
+from app.database import get_db
+from app.models import BecomeReviewer,Language
+from app.main import templates
 
 router = APIRouter(prefix="/becomereviewer", tags=["becomereviewer"])
 
 
 @router.get("")
-def becomereviewer(request: Request):
+def becomereviewer(request: Request, db: Session = Depends(get_db)):
     user = request.session.get("user")
     if not user:
         return templates.TemplateResponse(request=request, name="locked.html", context={"current_user": user, "access_message": "Only Logged in user can view this page."})

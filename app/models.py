@@ -83,6 +83,10 @@ class AIAnalysis(Base):
     summary = Column(Text, nullable=True)
     confidence = Column(String(50), nullable=True)
     created_at = Column(DateTime(timezone=True), server_default=func.now())
+    contribution = relationship(
+        "Contribution",
+        back_populates="ai_analysis"
+    )
 
 
 class Review(Base):
@@ -95,7 +99,7 @@ class Review(Base):
     created_at = Column(DateTime(timezone=True), server_default=func.now())
 
 class BecomeReviewer(Base):
-    __tablename__ = becomereviewer
+    __tablename__ = "becomereviewer"
     id = Column(Integer, primary_key=True, index=True)
     applicant_id = Column(Integer, ForeignKey("users.id"), nullable=False)
     language = Column(String(50), nullable=False)
@@ -103,3 +107,7 @@ class BecomeReviewer(Base):
     proficiency = Column(String(50), nullable=False)
     status = Column(Enum(ContributionStatus), default=ContributionStatus.pending, nullable=False)
     created_at = Column(DateTime(timezone=True), server_default=func.now())
+    applicant = relationship(
+        "User",
+        back_populates="applicant"
+    )
