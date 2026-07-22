@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>NAIJALINGO AI</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+  </head>
+  <body>
+    <div class="app-shell">
+      <button class="mobile-toggle" type="button" aria-label="Toggle navigation">
+        <span></span><span></span><span></span>
+      </button>
+      <div class="nav-overlay" aria-hidden="true"></div>
+      <aside class="sidebar">
+        <div class="brand">
+          <div class="brand-mark">NV</div>
+          <div>
+            <h1>NAIJALINGO AI</h1>
+            <p>Native-led language data for the future.</p>
+          </div>
+        </div>
+        <nav>
+          <a href="/" class="nav-link {% if active_nav == 'home' %}active{% endif %}">Home</a>
+          {% if current_user %}
+            <a href="/dashboard" class="nav-link {% if active_nav == 'dashboard' %}active{% endif %}" data-nav="dashboard">Dashboard</a>
+            <a href="/contribute" class="nav-link {% if active_nav == 'contribute' %}active{% endif %}" data-nav="contribute">Contribute</a>
+            {% if current_user.role in ['reviewer', 'admin'] %}
+              <a href="/review" class="nav-link {% if active_nav == 'review' %}active{% endif %}" data-nav="review">Review</a>
+            {% endif %}
+            {% if current_user.role not in ['reviewer', 'admin'] %}
+            <a href="/becomereviewer" class="nav-link {% if active_nav == 'becomereviewer' %}active{% endif %}" data-nav="becomereviewer">Become Reviewer</a>
+            {% endif %}
+            {% if current_user.role == 'admin' %}
+              <a href="/admin" class="nav-link {% if active_nav == 'admin' %}active{% endif %}" data-nav="admin">Admin</a>
+            {% endif %}
+            <a href="/dataset" class="nav-link {% if active_nav == 'dataset' %}active{% endif %}" data-nav="dataset">Dataset</a>
+            <a href="/profile" class="nav-link {% if active_nav == 'profile' %}active{% endif %}" data-nav="profile">Profile</a>
+            <div class="nav-divider"></div>
+            <a href="/auth/logout" class="nav-link">Logout</a>
+          {% else %}
+            <div class="nav-divider"></div>
+            <a href="/auth/login" class="nav-link">Login</a>
+            <a href="/auth/register" class="nav-link">Register</a>
+          {% endif %}
+        </nav>
+      </aside>
+      <main class="content">
+        <header class="page-header">
+          <div>
+            <p class="eyebrow">Build with Gemma</p>
+            <h2>{% block heading %}NAIJALINGO AI{% endblock %}</h2>
+          </div>
+          <div class="header-pill">Trusted by community reviewers</div>
+        </header>
+        {% block content %}{% endblock %}
+      </main>
+    </div>
+    <script src="/static/js/app.js"></script>
+  </body>
+</html>

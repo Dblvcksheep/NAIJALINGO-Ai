@@ -1,0 +1,102 @@
+{% extends "base.html" %}
+
+{% block heading %}
+Become a Reviewer
+{% endblock %}
+
+
+{% block content %}
+
+<section class="card">
+
+<h2>Submit an application</h2>
+
+<p>
+Choose a language, Apply to become a reviewer
+</p>
+
+
+<form method="post" action="/becomereviewer/submit">
+
+
+<label for="language">
+Language
+</label>
+
+<select id="language" name="language_id" required>
+
+{% for language in languages %}
+
+<option value="{{ language.id }}">
+{{ language.name }} · {{ language.region }}
+</option>
+
+{% endfor %}
+
+</select>
+
+
+
+<label for="native">
+Native
+</label>
+
+
+<select id="native" name="native" required>
+
+<option value="yes">
+Yes
+</option>
+
+<option value="no">
+No
+</option>
+
+
+</select>
+
+<label for="proficiency">
+Proficiency
+</label>
+
+
+<select id="proficiency" name="proficiency" required>
+
+<option value="beginner">
+Beginner
+</option>
+
+<option value="intermediate">
+Intermediate
+</option>
+
+<option value="advance">
+Advance
+</option>
+
+<option value="expert">
+Expert
+</option>
+
+
+</select>
+
+
+
+<button 
+class="button primary"
+type="submit">
+
+Submit
+
+</button>
+
+
+</form>
+
+
+</section>
+
+
+
+{% endblock %}

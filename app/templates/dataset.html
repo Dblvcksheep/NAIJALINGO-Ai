@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+{% block heading %}Dataset overview{% endblock %}
+{% block content %}
+<section class="card">
+  <h2>Approved dataset overview</h2>
+  <p>This page shows safe, aggregate statistics only. The underlying language data remains protected.</p>
+  {% for item in stats %}
+  <article class="review-item">
+    <h3>{{ item.language.name }}</h3>
+    <p>Total contributions: {{ item.total }}</p>
+    <p>Approved entries: {{ item.approved }}</p>
+    <p>Pending review: {{ item.pending }}</p>
+    <p>Status: Available for licensing</p>
+  </article>
+  {% endfor %}
+</section>
+{% endblock %}

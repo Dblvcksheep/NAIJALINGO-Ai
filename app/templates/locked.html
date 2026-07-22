@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+{% block heading %}Access required{% endblock %}
+{% block content %}
+<section class="hero-panel">
+  <div class="hero-copy">
+    <p class="eyebrow">Protected workspace</p>
+    <h1>{{ access_message or 'Sign in to continue.' }}</h1>
+    <p>This area is reserved for authenticated contributors, reviewers, or administrators. Join the platform to start shaping trusted language data.</p>
+    <div class="actions">
+      {% if current_user %}
+      <a class="button primary" href="/">Return home</a>
+      {% else %}
+      <a class="button primary" href="/auth/login">Sign in</a>
+      <a class="button" href="/auth/register">Create account</a>
+      {% endif %}
+    </div>
+  </div>
+  <div class="info-card large">
+    <div class="status-badge">Secure</div>
+    <h3>Why this matters</h3>
+    <p>Native speakers remain the authority. Every contribution is reviewed before it becomes part of the trusted dataset.</p>
+  </div>
+</section>
+{% endblock %}

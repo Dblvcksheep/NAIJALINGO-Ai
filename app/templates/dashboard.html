@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+{% block heading %}Contributor workspace{% endblock %}
+{% block content %}
+<section class="hero-panel">
+  <div class="hero-copy">
+    <p class="eyebrow">Contributor dashboard</p>
+    <h1>Welcome back to your language collection workspace.</h1>
+    <p>Your entries help shape trusted, review-ready language data while keeping native speakers at the center.</p>
+  </div>
+  <div class="info-card">
+    <div class="status-badge">Your progress</div>
+    <div class="grid">
+      <div class="metric">
+        <span>Contributions</span>
+        <strong>{{ stats.contributions }}</strong>
+      </div>
+      <div class="metric">
+        <span>Points</span>
+        <strong>{{ stats.points }}</strong>
+      </div>
+      <div class="metric">
+        <span>Approved</span>
+        <strong>{{ stats.approved }}</strong>
+      </div>
+    </div>
+  </div>
+</section>
+<section class="grid two">
+  <article class="card">
+    <div class="status-badge">Recent activity</div>
+    <h3>Latest submissions</h3>
+    <ul>
+      {% for contribution in last_three %}
+      <li>{{ contribution.source_text }} · {{ contribution.type }} · {{ contribution.status }}</li>
+      {% endfor %}
+    </ul>
+  </article>
+  <article class="card spotlight">
+    <div class="status-badge">Next step</div>
+    <h3>Keep the workflow moving</h3>
+    <p>Submit a new contribution or review the latest suggestions from Gemma to keep your dataset growing with clarity.</p>
+    <div class="actions">
+      <a class="button primary" href="/contribute">Add contribution</a>
+      <a class="button" href="/profile">View profile</a>
+    </div>
+  </article>
+</section>
+{% endblock %}

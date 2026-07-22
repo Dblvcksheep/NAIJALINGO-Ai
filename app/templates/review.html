@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% block heading %}Review queue{% endblock %}
+{% block content %}
+<section class="card">
+  <h2>Review dashboard</h2>
+  <p>Pending items are shown here for expert review. AI suggestions are visible but never replace reviewer judgment.</p>
+  {% for item in pending %}
+  <article class="review-item">
+    <h3>From:{{ item.source_text }} · To:{{ item.translated_text }}</h3>
+    <p>AiSummary: {{ item.ai_analysis.summary or 'No explanation provided.' }}</p>
+    <p>AiConfidence: {{ item.ai_analysis.confidence or 'failed to fetch confidence'}}
+    <p>Landuage: {{ item.language }}
+    <form method="post" action="/review/decision">
+      <input type="hidden" name="contribution_id" value="{{ item.id }}">
+      <label for="decision">Decision</label>
+      <select name="decision">
+        <option value="approve">Approve</option>
+        <option value="reject">Reject</option>
+      </select>
+      <label for="comment">Comment</label>
+      <textarea name="comment"></textarea>
+      <button class="button primary" type="submit">Submit review</button>
+    </form>
+  </article>
+  {% endfor %}
+</section>
+{% endblock %}

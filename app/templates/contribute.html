@@ -1,0 +1,655 @@
+{% extends "base.html" %}
+
+{% block heading %}
+Contribute data
+{% endblock %}
+
+
+{% block content %}
+
+<section class="card">
+
+<h2>Submit a new contribution</h2>
+
+<p>
+Choose a language and entry type. Gemma will provide suggestions,
+but your review remains central.
+</p>
+
+
+<form method="post" action="/contribute">
+
+
+<label for="language">
+Language
+</label>
+
+<select id="language" name="language_id" required>
+
+{% for language in languages %}
+
+<option value="{{ language.id }}">
+{{ language.name }} · {{ language.region }}
+</option>
+
+{% endfor %}
+
+</select>
+
+
+
+<label for="type">
+Contribution type
+</label>
+
+
+<select id="type" name="type" required>
+
+<option value="word">
+Word
+</option>
+
+<option value="sentence">
+Sentence
+</option>
+
+<option value="proverb">
+Proverb
+</option>
+
+</select>
+
+
+
+<label for="source_text">
+Source text
+</label>
+
+
+<input
+id="source_text"
+name="source_text"
+placeholder="Enter word or sentence"
+required
+>
+
+
+<p id="sourceStatus"></p>
+
+
+
+<label for="translated_text">
+Translation
+</label>
+
+
+<input
+id="translated_text"
+name="translated_text"
+placeholder="Gemma translation"
+>
+
+
+
+<label for="pronunciation">
+Pronunciation
+</label>
+
+
+<input
+id="pronunciation"
+name="pronunciation"
+placeholder="Example: roo-wah"
+>
+
+
+
+<label>
+Grammar feedback
+</label>
+
+
+<p id="grammar"></p>
+
+
+
+<label for="explanation">
+Explanation
+</label>
+
+
+<textarea
+id="explanation"
+name="explanation">
+</textarea>
+
+
+
+<label for="example_usage">
+English Example usage
+</label>
+
+
+<textarea
+id="example_usage"
+name="example_usage">
+</textarea>
+
+
+
+<label for="translated_usage">
+Translated example
+</label>
+
+
+<textarea
+id="translated_usage"
+name="translated_usage">
+</textarea>
+
+
+
+<input
+id="confidence"
+name="confidence"
+type="hidden"
+>
+
+
+<textarea
+id="summary"
+name="summary"
+hidden>
+</textarea>
+
+
+
+<button 
+class="button primary"
+type="submit">
+
+Submit
+
+</button>
+
+
+</form>
+
+
+</section>
+
+
+
+
+
+<section class="card">
+
+
+<h3>
+Gemma analysis
+</h3>
+
+
+<strong>
+Confidence
+</strong>
+
+<p id="aiConfidence">
+Waiting...
+</p>
+
+
+
+<strong>
+Summary
+</strong>
+
+<p id="aiSummary">
+Waiting...
+</p>
+
+
+</section>
+
+
+
+
+
+<script>
+
+
+const sourceInput = document.getElementById(
+"source_text"
+);
+
+
+const translatedInput = document.getElementById(
+"translated_text"
+);
+
+
+const languageSelect = document.getElementById(
+"language"
+);
+
+
+const typeSelect = document.getElementById(
+"type"
+);
+
+
+const pronunciationInput = document.getElementById(
+"pronunciation"
+);
+
+
+const explanationInput = document.getElementById(
+"explanation"
+);
+
+
+const exampleInput = document.getElementById(
+"example_usage"
+);
+
+
+const grammarBox = document.getElementById(
+"grammar"
+);
+
+
+const confidenceInput = document.getElementById(
+"confidence"
+);
+
+
+const summaryInput = document.getElementById(
+"summary"
+);
+
+
+const aiConfidence = document.getElementById(
+"aiConfidence"
+);
+
+
+const aiSummary = document.getElementById(
+"aiSummary"
+);
+
+
+const sourceStatus = document.getElementById(
+"sourceStatus"
+);
+
+
+
+let sourceTimer = null;
+
+let reviewTimer = null;
+
+
+let lastSource = "";
+
+let lastTranslation = "";
+
+
+
+
+
+/*
+=================================
+SOURCE -> TRANSLATION
+=================================
+*/
+
+
+async function analyzeSource(){
+
+
+    const text = sourceInput.value.trim();
+
+
+    if(!text){
+        return;
+    }
+
+
+    if(text === lastSource){
+        return;
+    }
+
+
+
+    sourceStatus.textContent =
+    "Gemma is analyzing...";
+
+
+
+    try{
+
+
+        const response = await fetch(
+            "/ai/analyze",
+            {
+
+                method:"POST",
+
+                headers:{
+                    "Content-Type":"application/json"
+                },
+
+
+                body:JSON.stringify({
+
+                    language:
+                    languageSelect.value,
+
+
+                    target_language:
+                    "english",
+
+
+                    text:text
+
+                })
+
+            }
+        );
+
+
+
+        if(!response.ok){
+
+            throw new Error(
+                "AI translation failed"
+            );
+
+        }
+
+
+
+        const data =
+        await response.json();
+
+
+
+        translatedInput.value =
+        data.translation || "";
+
+
+
+        pronunciationInput.value =
+        data.pronunciation || "";
+
+
+
+        lastSource = text;
+
+
+        sourceStatus.textContent =
+        "Translation generated";
+
+
+    }
+
+
+    catch(error){
+
+
+        console.error(error);
+
+
+        sourceStatus.textContent =
+        "AI error";
+
+
+    }
+
+
+}
+
+
+
+
+
+
+
+/*
+=================================
+TRANSLATION -> REVIEW
+=================================
+*/
+
+
+async function reviewTranslation(){
+
+
+    const translated =
+    translatedInput.value.trim();
+
+
+
+    if(!translated){
+
+        return;
+
+    }
+
+
+
+    if(translated === lastTranslation){
+
+        return;
+
+    }
+
+
+
+
+    try{
+
+
+        const response = await fetch(
+            "/ai/review",
+            {
+
+                method:"POST",
+
+
+                headers:{
+
+                    "Content-Type":
+                    "application/json"
+
+                },
+
+
+                body:JSON.stringify({
+
+
+                    language:
+                    languageSelect.value,
+
+
+                    contribution_type:
+                    typeSelect.value,
+
+
+                    source:
+                    sourceInput.value,
+
+
+                    translated:
+                    translated
+
+
+                })
+
+            }
+        );
+
+
+
+        if(!response.ok){
+
+            throw new Error(
+                "Review failed"
+            );
+
+        }
+
+
+
+        const data =
+        await response.json();
+
+
+
+
+        explanationInput.value =
+        data.explanation || "";
+
+
+
+        grammarBox.textContent =
+        data.grammar || "";
+
+
+
+        exampleInput.value =
+        data.example_sentence || "";
+
+
+
+        confidenceInput.value =
+        data.review.confidence || "";
+
+
+
+        summaryInput.value =
+        data.review.summary || "";
+
+
+
+        aiConfidence.textContent =
+        data.review.confidence || "Unknown";
+
+
+
+        aiSummary.textContent =
+        data.review.summary || "";
+
+
+
+        lastTranslation =
+        translated;
+
+
+    }
+
+
+    catch(error){
+
+        console.error(error);
+
+    }
+
+
+}
+
+
+
+
+
+
+
+/*
+=================================
+EVENT LISTENERS
+=================================
+*/
+
+
+sourceInput.addEventListener(
+"input",
+()=>{
+
+
+    clearTimeout(sourceTimer);
+
+
+
+    sourceTimer =
+    setTimeout(
+        analyzeSource,
+        1500
+    );
+
+
+});
+
+
+
+
+
+sourceInput.addEventListener(
+"blur",
+()=>{
+
+
+    clearTimeout(sourceTimer);
+
+
+    analyzeSource();
+
+
+});
+
+
+
+
+
+
+translatedInput.addEventListener(
+"input",
+()=>{
+
+
+    clearTimeout(reviewTimer);
+
+
+
+    reviewTimer =
+    setTimeout(
+        reviewTranslation,
+        1500
+    );
+
+
+});
+
+
+
+
+
+translatedInput.addEventListener(
+"blur",
+()=>{
+
+
+    clearTimeout(reviewTimer);
+
+
+
+    reviewTranslation();
+
+
+});
+
+
+
+</script>
+
+
+{% endblock %}

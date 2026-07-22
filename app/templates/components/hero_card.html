@@ -1,0 +1,24 @@
+<section class="hero-panel">
+  <div class="hero-copy">
+    <p class="eyebrow">Build with Gemma</p>
+    <h1>Preserve languages with a community-first AI workflow.</h1>
+    <p>Native speakers remain the authority, while AI helps surface translations, grammar ideas, example sentences, and meaning guidance for better review.</p>
+    <div class="actions">
+      {% if current_user %}
+      <a class="button primary" href="/contribute">Continue contributing</a>
+      {% else %}
+      <a class="button primary" href="/auth/register">Start contributing</a>
+      {% endif %}
+      <a class="button" href="/dashboard">Open workspace</a>
+    </div>
+  </div>
+  <div class="info-card">
+    <div class="status-badge">Trusted review loop</div>
+    <h3>Why it works</h3>
+    <ul>
+      <li>Community-led contributions remain central.</li>
+      <li>Gemma offers assistive suggestions only.</li>
+      <li>Reviewers keep every approved entry accountable.</li>
+    </ul>
+  </div>
+</section>

@@ -1,0 +1,56 @@
+{% extends "base.html" %}
+{% block heading %}Admin console{% endblock %}
+{% block content %}
+<section class="card">
+  <h2>Admin dashboard</h2>
+  <p>Manage users, languages, and review activity from one place.</p>
+  <div class="grid three">
+    <article class="card">
+      <h3>Users</h3>
+      <p>{{ stats.users }}</p>
+    </article>
+    <article class="card">
+      <h3>Languages</h3>
+      <p>{{ stats.languages }}</p>
+    </article>
+    <article class="card">
+      <h3>Contributions</h3>
+      <p>{{ stats.contributions }}</p>
+    </article>
+  </div>
+  <h3>Add a language</h3>
+  <form method="post" action="/admin/languages">
+    <label for="name">Name</label>
+    <input id="name" name="name" required>
+    <label for="region">Region</label>
+    <input id="region" name="region" required>
+    <label for="family">Family</label>
+    <input id="family" name="family" required>
+    <button class="button primary" type="submit">Save language</button>
+  </form>
+
+  <h2>Reviewer Application</h2>
+  <p>View all pending reviewer application.</p>
+  {% if pending %}
+  {% for item in pending %}
+  <article class="review-item">
+    <h3>{{ item.applicant.fullname }}</h3>
+    <p>Is Native: {{ item.native }}</p>
+    <p>Proficiency: {{ item.proficiency }}</p>
+    <p>language: {{ item.language }}</p>
+    <form method="post" action="/admin/reviewer/decision">
+      <input type="hidden" name="applicant_id" value="{{ item.id }}">
+      <label for="decision">Decision</label>
+      <select name="decision">
+        <option value="approve">Approve</option>
+        <option value="reject">Reject</option>
+      </select>
+      <button class="button primary" type="submit">Submit review</button>
+    </form>
+  </article>
+  {% endfor %}
+  {% else %}
+  <p>No pending Reviewer Application</p>
+  {% endif %}
+</section>
+{% endblock %}

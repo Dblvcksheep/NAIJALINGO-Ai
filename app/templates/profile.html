@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+{% block heading %}Profile{% endblock %}
+{% block content %}
+<section class="card">
+  <h2>Your profile</h2>
+  <p>Track progress, achievements, and contributions over time.</p>
+  <div class="grid three">
+    <article class="card">
+      <h3>Points</h3>
+      <p>{{ stats.points }}</p>
+    </article>
+    <article class="card">
+      <h3>Contributions</h3>
+      <p>{{ stats.contributions }}</p>
+    </article>
+    <article class="card">
+      <h3>Approved</h3>
+      <p>{{ stats.approved }}</p>
+    </article>
+  </div>
+</section>
+{% endblock %}
