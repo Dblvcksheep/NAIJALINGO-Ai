@@ -1,5 +1,5 @@
-from typing import Optional, List, Dict
 import os
+import json
 from dotenv import load_dotenv
 from google.genai import types
 from google import genai

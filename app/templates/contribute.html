@@ -9,171 +9,143 @@ Contribute data
 
 <section class="card">
 
-<h2>Submit a new contribution</h2>
+    <h2>Submit a new contribution</h2>
 
-<p>
-Choose a language and entry type. Gemma will provide suggestions,
-but your review remains central.
-</p>
-
-
-<form method="post" action="/contribute">
+    <p>
+        Choose a language and entry type. Gemma will provide suggestions,
+        but your review remains central.
+    </p>
 
 
-<label for="language">
-Language
-</label>
-
-<select id="language" name="language_id" required>
-
-{% for language in languages %}
-
-<option value="{{ language.id }}">
-{{ language.name }} · {{ language.region }}
-</option>
-
-{% endfor %}
-
-</select>
+    <form method="post" action="/contribute">
 
 
+        <label for="language">
+            Language
+        </label>
 
-<label for="type">
-Contribution type
-</label>
+        <select id="language" name="language_id" required>
 
+            {% for language in languages %}
 
-<select id="type" name="type" required>
+            <option value="{{ language.id }}" data-name="{{ language.name }}">
+                {{ language.name }} · {{ language.region }}
+            </option>
 
-<option value="word">
-Word
-</option>
+            {% endfor %}
 
-<option value="sentence">
-Sentence
-</option>
-
-<option value="proverb">
-Proverb
-</option>
-
-</select>
+        </select>
 
 
 
-<label for="source_text">
-Source text
-</label>
+        <label for="type">
+            Contribution type
+        </label>
 
 
-<input
-id="source_text"
-name="source_text"
-placeholder="Enter word or sentence"
-required
->
+        <select id="type" name="type" required>
 
+            <option value="word">
+                Word
+            </option>
 
-<p id="sourceStatus"></p>
+            <option value="sentence">
+                Sentence
+            </option>
 
+            <option value="proverb">
+                Proverb
+            </option>
 
-
-<label for="translated_text">
-Translation
-</label>
-
-
-<input
-id="translated_text"
-name="translated_text"
-placeholder="Gemma translation"
->
+        </select>
 
 
 
-<label for="pronunciation">
-Pronunciation
-</label>
+        <label for="source_text">
+            Source text
+        </label>
 
 
-<input
-id="pronunciation"
-name="pronunciation"
-placeholder="Example: roo-wah"
->
+        <input id="source_text" name="source_text" placeholder="Enter word or sentence" required>
 
 
-
-<label>
-Grammar feedback
-</label>
-
-
-<p id="grammar"></p>
+        <p id="sourceStatus"></p>
 
 
 
-<label for="explanation">
-Explanation
-</label>
+        <label for="translated_text">
+            Translation
+        </label>
 
 
-<textarea
-id="explanation"
-name="explanation">
+        <input id="translated_text" name="translated_text" placeholder="Gemma translation">
+
+
+
+        <label for="pronunciation">
+            Pronunciation
+        </label>
+
+
+        <input id="pronunciation" name="pronunciation" placeholder="Example: roo-wah">
+
+
+
+        <label>
+            Grammar feedback
+        </label>
+
+
+        <p id="grammar"></p>
+
+
+
+        <label for="explanation">
+            Explanation
+        </label>
+
+
+        <textarea id="explanation" name="explanation">
 </textarea>
 
 
 
-<label for="example_usage">
-English Example usage
-</label>
+        <label for="example_usage">
+            English Example usage
+        </label>
 
 
-<textarea
-id="example_usage"
-name="example_usage">
+        <textarea id="example_usage" name="example_usage">
 </textarea>
 
 
 
-<label for="translated_usage">
-Translated example
-</label>
+        <label for="translated_usage">
+            Translated example
+        </label>
 
 
-<textarea
-id="translated_usage"
-name="translated_usage">
+        <textarea id="translated_usage" name="translated_usage">
 </textarea>
 
 
 
-<input
-id="confidence"
-name="confidence"
-type="hidden"
->
+        <input id="confidence" name="confidence" type="hidden">
 
 
-<textarea
-id="summary"
-name="summary"
-hidden>
+        <textarea id="summary" name="summary" hidden>
 </textarea>
 
 
 
-<button 
-class="button primary"
-type="submit">
+        <button class="button primary" type="submit">
 
-Submit
+            Submit
 
-</button>
+        </button>
 
 
-</form>
+    </form>
 
 
 </section>
@@ -185,28 +157,28 @@ Submit
 <section class="card">
 
 
-<h3>
-Gemma analysis
-</h3>
+    <h3>
+        Gemma analysis
+    </h3>
 
 
-<strong>
-Confidence
-</strong>
+    <strong>
+        Confidence
+    </strong>
 
-<p id="aiConfidence">
-Waiting...
-</p>
+    <p id="aiConfidence">
+        Waiting...
+    </p>
 
 
 
-<strong>
-Summary
-</strong>
+    <strong>
+        Summary
+    </strong>
 
-<p id="aiSummary">
-Waiting...
-</p>
+    <p id="aiSummary">
+        Waiting...
+    </p>
 
 
 </section>
@@ -218,434 +190,441 @@ Waiting...
 <script>
 
 
-const sourceInput = document.getElementById(
-"source_text"
-);
+    const sourceInput = document.getElementById(
+        "source_text"
+    );
 
 
-const translatedInput = document.getElementById(
-"translated_text"
-);
+    const translatedInput = document.getElementById(
+        "translated_text"
+    );
 
 
-const languageSelect = document.getElementById(
-"language"
-);
+    const languageSelect = document.getElementById(
+        "language"
+    );
 
 
-const typeSelect = document.getElementById(
-"type"
-);
+    const typeSelect = document.getElementById(
+        "type"
+    );
 
 
-const pronunciationInput = document.getElementById(
-"pronunciation"
-);
+    const pronunciationInput = document.getElementById(
+        "pronunciation"
+    );
 
 
-const explanationInput = document.getElementById(
-"explanation"
-);
+    const explanationInput = document.getElementById(
+        "explanation"
+    );
 
 
-const exampleInput = document.getElementById(
-"example_usage"
-);
+    const exampleInput = document.getElementById(
+        "example_usage"
+    );
 
 
-const grammarBox = document.getElementById(
-"grammar"
-);
+    const grammarBox = document.getElementById(
+        "grammar"
+    );
 
 
-const confidenceInput = document.getElementById(
-"confidence"
-);
+    const confidenceInput = document.getElementById(
+        "confidence"
+    );
 
 
-const summaryInput = document.getElementById(
-"summary"
-);
+    const summaryInput = document.getElementById(
+        "summary"
+    );
 
 
-const aiConfidence = document.getElementById(
-"aiConfidence"
-);
+    const aiConfidence = document.getElementById(
+        "aiConfidence"
+    );
 
 
-const aiSummary = document.getElementById(
-"aiSummary"
-);
+    const aiSummary = document.getElementById(
+        "aiSummary"
+    );
 
 
-const sourceStatus = document.getElementById(
-"sourceStatus"
-);
-
-
-
-let sourceTimer = null;
-
-let reviewTimer = null;
-
-
-let lastSource = "";
-
-let lastTranslation = "";
+    const sourceStatus = document.getElementById(
+        "sourceStatus"
+    );
 
 
 
+    let sourceTimer = null;
+
+    let reviewTimer = null;
 
 
-/*
-=================================
-SOURCE -> TRANSLATION
-=================================
-*/
+    let lastSource = "";
+
+    let lastTranslation = "";
 
 
-async function analyzeSource(){
 
 
-    const text = sourceInput.value.trim();
 
+    /*
+    =================================
+    SOURCE -> TRANSLATION
+    =================================
+    */
 
-    if(!text){
-        return;
+    function getSelectedLanguageName() {
+        return languageSelect.options[languageSelect.selectedIndex].dataset.name;
     }
 
-
-    if(text === lastSource){
-        return;
-    }
+    async function analyzeSource() {
 
 
-
-    sourceStatus.textContent =
-    "Gemma is analyzing...";
+        const text = sourceInput.value.trim();
 
 
-
-    try{
-
-
-        const response = await fetch(
-            "/ai/analyze",
-            {
-
-                method:"POST",
-
-                headers:{
-                    "Content-Type":"application/json"
-                },
+        if (!text) {
+            return;
+        }
 
 
-                body:JSON.stringify({
-
-                    language:
-                    languageSelect.value,
-
-
-                    target_language:
-                    "english",
+        if (text === lastSource) {
+            return;
+        }
 
 
-                    text:text
 
-                })
+        sourceStatus.textContent =
+            "Gemma is analyzing...";
+
+
+
+        try {
+
+
+            const response = await fetch(
+                "/ai/analyze",
+                {
+
+                    method: "POST",
+
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+
+
+                    body: JSON.stringify({
+
+                        language:
+                            getSelectedLanguageName(),
+
+
+                        target_language:
+                            "english",
+
+
+                        text: text
+
+                    })
+
+                }
+            );
+
+
+
+            if (!response.ok) {
+
+                throw new Error(
+                    "AI translation failed"
+                );
 
             }
-        );
 
 
 
-        if(!response.ok){
+            const data =
+                await response.json();
 
-            throw new Error(
-                "AI translation failed"
-            );
+
+
+            translatedInput.value =
+                data.translation || "";
+
+
+
+            pronunciationInput.value =
+                data.pronunciation || "";
+
+
+
+            lastSource = text;
+
+            lastTranslation = ""; // Ensure review runs
+
+            await reviewTranslation();
+
+
+            sourceStatus.textContent =
+                "Translation generated";
+
+
+        }
+
+
+        catch (error) {
+
+
+            console.error(error);
+
+
+            sourceStatus.textContent =
+                "AI error";
+
+
+        }
+
+
+    }
+
+
+
+
+
+
+
+    /*
+    =================================
+    TRANSLATION -> REVIEW
+    =================================
+    */
+
+
+    async function reviewTranslation() {
+
+
+        const translated =
+            translatedInput.value.trim();
+
+
+
+        if (!translated) {
+
+            return;
 
         }
 
 
 
-        const data =
-        await response.json();
+        if (translated === lastTranslation) {
 
-
-
-        translatedInput.value =
-        data.translation || "";
-
-
-
-        pronunciationInput.value =
-        data.pronunciation || "";
-
-
-
-        lastSource = text;
-
-
-        sourceStatus.textContent =
-        "Translation generated";
-
-
-    }
-
-
-    catch(error){
-
-
-        console.error(error);
-
-
-        sourceStatus.textContent =
-        "AI error";
-
-
-    }
-
-
-}
-
-
-
-
-
-
-
-/*
-=================================
-TRANSLATION -> REVIEW
-=================================
-*/
-
-
-async function reviewTranslation(){
-
-
-    const translated =
-    translatedInput.value.trim();
-
-
-
-    if(!translated){
-
-        return;
-
-    }
-
-
-
-    if(translated === lastTranslation){
-
-        return;
-
-    }
-
-
-
-
-    try{
-
-
-        const response = await fetch(
-            "/ai/review",
-            {
-
-                method:"POST",
-
-
-                headers:{
-
-                    "Content-Type":
-                    "application/json"
-
-                },
-
-
-                body:JSON.stringify({
-
-
-                    language:
-                    languageSelect.value,
-
-
-                    contribution_type:
-                    typeSelect.value,
-
-
-                    source:
-                    sourceInput.value,
-
-
-                    translated:
-                    translated
-
-
-                })
-
-            }
-        );
-
-
-
-        if(!response.ok){
-
-            throw new Error(
-                "Review failed"
-            );
+            return;
 
         }
 
 
 
-        const data =
-        await response.json();
+
+        try {
+
+
+            const response = await fetch(
+                "/ai/review",
+                {
+
+                    method: "POST",
+
+
+                    headers: {
+
+                        "Content-Type":
+                            "application/json"
+
+                    },
+
+
+                    body: JSON.stringify({
+
+
+                        language:
+                            getSelectedLanguageName(),
+
+
+                        contribution_type:
+                            typeSelect.value,
+
+
+                        source:
+                            sourceInput.value,
+
+
+                        translated:
+                            translated
+
+
+                    })
+
+                }
+            );
+
+
+
+            if (!response.ok) {
+
+                throw new Error(
+                    "Review failed"
+                );
+
+            }
+
+
+
+            const data =
+                await response.json();
 
 
 
 
-        explanationInput.value =
-        data.explanation || "";
+            explanationInput.value =
+                data.explanation || "";
 
 
 
-        grammarBox.textContent =
-        data.grammar || "";
+            grammarBox.textContent =
+                data.grammar || "";
 
 
 
-        exampleInput.value =
-        data.example_sentence || "";
+            exampleInput.value =
+                data.example_sentence || "";
 
 
 
-        confidenceInput.value =
-        data.review.confidence || "";
+            confidenceInput.value =
+                data.review.confidence || "";
 
 
 
-        summaryInput.value =
-        data.review.summary || "";
+            summaryInput.value =
+                data.review.summary || "";
 
 
 
-        aiConfidence.textContent =
-        data.review.confidence || "Unknown";
+            aiConfidence.textContent =
+                data.review.confidence || "Unknown";
 
 
 
-        aiSummary.textContent =
-        data.review.summary || "";
+            aiSummary.textContent =
+                data.review.summary || "";
 
 
 
-        lastTranslation =
-        translated;
+            lastTranslation =
+                translated;
+
+
+        }
+
+
+        catch (error) {
+
+            console.error(error);
+
+        }
 
 
     }
 
 
-    catch(error){
-
-        console.error(error);
-
-    }
-
-
-}
 
 
 
 
 
+    /*
+    =================================
+    EVENT LISTENERS
+    =================================
+    */
 
 
-/*
-=================================
-EVENT LISTENERS
-=================================
-*/
+    sourceInput.addEventListener(
+        "input",
+        () => {
 
 
-sourceInput.addEventListener(
-"input",
-()=>{
-
-
-    clearTimeout(sourceTimer);
+            clearTimeout(sourceTimer);
 
 
 
-    sourceTimer =
-    setTimeout(
-        analyzeSource,
-        1500
-    );
+            sourceTimer =
+                setTimeout(
+                    analyzeSource,
+                    1500
+                );
 
 
-});
+        });
 
 
 
 
 
-sourceInput.addEventListener(
-"blur",
-()=>{
+    sourceInput.addEventListener(
+        "blur",
+        () => {
 
 
-    clearTimeout(sourceTimer);
+            clearTimeout(sourceTimer);
 
 
-    analyzeSource();
+            analyzeSource();
 
 
-});
+        });
 
 
 
 
 
 
-translatedInput.addEventListener(
-"input",
-()=>{
+    translatedInput.addEventListener(
+        "input",
+        () => {
 
 
-    clearTimeout(reviewTimer);
-
-
-
-    reviewTimer =
-    setTimeout(
-        reviewTranslation,
-        1500
-    );
-
-
-});
+            clearTimeout(reviewTimer);
 
 
 
+            reviewTimer =
+                setTimeout(
+                    reviewTranslation,
+                    1500
+                );
 
 
-translatedInput.addEventListener(
-"blur",
-()=>{
-
-
-    clearTimeout(reviewTimer);
+        });
 
 
 
-    reviewTranslation();
 
 
-});
+    translatedInput.addEventListener(
+        "blur",
+        () => {
+
+
+            clearTimeout(reviewTimer);
+
+
+
+            reviewTranslation();
+
+
+        });
 
 
 

@@ -1,4 +1,5 @@
 from fastapi import APIRouter, HTTPException
+import traceback
 from app.services.gemma_service import (
     explain_text,
     pronunciation,
@@ -89,7 +90,7 @@ def review(request: ReviewRequest):
             "explanation": explanation.explanation,
 
 
-            "grammar": grammar.corrected_text,
+            "grammar": grammar.corrected_text if grammar and grammar.corrected_text else "No correction" ,
 
 
             "example_sentence": sentence.sentence,
@@ -107,6 +108,7 @@ def review(request: ReviewRequest):
 
 
     except Exception as e:
+        traceback.print_exc() 
 
         raise HTTPException(
             status_code=500,
