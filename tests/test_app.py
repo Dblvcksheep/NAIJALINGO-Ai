@@ -41,3 +41,83 @@ def test_password_hashing_round_trip():
     assert hashed != password
     assert verify_password(password, hashed)
     assert not verify_password("wrong-password", hashed)
+
+
+def test_ai_review_is_resilient_to_individual_ai_failures(monkeypatch):
+    from app.routes import ai as ai_routes
+
+    class DummyResponse:
+        def __init__(self, **kwargs):
+            self.__dict__.update(kwargs)
+
+    monkeypatch.setattr(
+        ai_routes,
+        "explain_text",
+        lambda text: DummyResponse(explanation="Meaning is clear."),
+    )
+    monkeypatch.setattr(
+        ai_routes,
+        "grammar_review",
+        lambda text: (_ for _ in ()).throw(RuntimeError("grammar parsing failed")),
+    )
+    monkeypatch.setattr(
+        ai_routes,
+        "english_sentence",
+        lambda word: DummyResponse(sentence="This is a natural English sentence."),
+    )
+    monkeypatch.setattr(
+        ai_routes,
+        "review_contribution",
+        lambda **kwargs: DummyResponse(confidence="medium", summary="Looks acceptable."),
+    )
+
+    response = client.post(
+        "/ai/review",
+        json={
+            "language": "English",
+            "contribution_type": "translation",
+            "source": "Hello",
+            "translated": "Hello",
+        },
+    )
+
+    assert response.status_code == 200
+    payload = response.json()
+    assert payload["explanation"] == "Meaning is clear."
+    assert payload["grammar"] == "No correction"
+    assert payload["example_sentence"] == "This is a natural English sentence."
+    assert payload["review"]["confidence"] == "medium"
+    assert payload["review"]["summary"] == "Looks acceptable."
+
+
+def test_gemma_wrapper_recovers_from_fenced_json(monkeypatch):
+    from app.services import gemma_service
+    from app.schemas import GrammarResponse
+
+    class FakePart:
+        def __init__(self, text):
+            self.text = text
+
+    class FakeContent:
+        def __init__(self, parts):
+            self.parts = parts
+
+    class FakeCandidate:
+        def __init__(self, text):
+            self.content = FakeContent([FakePart(text)])
+
+    class FakeResponse:
+        def __init__(self, text):
+            self.parsed = None
+            self.candidates = [FakeCandidate(text)]
+
+    monkeypatch.setattr(
+        gemma_service.client.models,
+        "generate_content",
+        lambda **kwargs: FakeResponse('```\n{"corrected_text": "Car"}\n```'),
+    )
+
+    result = gemma_service.grammar_review(text="car")
+
+    assert isinstance(result, GrammarResponse)
+    assert result.corrected_text == "Car"

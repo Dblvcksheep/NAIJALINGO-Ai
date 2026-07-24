@@ -14,6 +14,46 @@ client = genai.Client(
 )
 
 
+def _parse_gemma_response(response, response_schema=None):
+    parsed = getattr(response, "parsed", None)
+    if parsed is not None:
+        return parsed
+
+    raw_text = ""
+    candidates = getattr(response, "candidates", None) or []
+    for candidate in candidates:
+        content = getattr(candidate, "content", None)
+        parts = getattr(content, "parts", None) or []
+        for part in parts:
+            text = getattr(part, "text", None)
+            if text:
+                raw_text += text
+                break
+
+    if not raw_text:
+        return None
+
+    cleaned = raw_text.strip()
+    if cleaned.startswith("```"):
+        cleaned = cleaned.strip("`").strip()
+    if cleaned.lower().startswith("json"):
+        cleaned = cleaned[4:].strip()
+
+    try:
+        payload, _ = json.JSONDecoder().raw_decode(cleaned)
+    except json.JSONDecodeError:
+        start = cleaned.find("{")
+        end = cleaned.rfind("}")
+        if start == -1 or end == -1 or end <= start:
+            raise
+        payload = json.loads(cleaned[start : end + 1])
+
+    if response_schema is None:
+        return payload
+
+    return response_schema.model_validate(payload)
+
+
 def ask_gemma(
     system_prompt: str,
     user_prompt: str,
@@ -38,8 +78,8 @@ def ask_gemma(
         contents=user_prompt,
         config=config,
     )
-
-    return response.parsed
+   
+    return _parse_gemma_response(response, response_schema=response_schema)
 
 
 def explain_text(text):

@@ -59,58 +59,46 @@ def analyze(request: AnalyzeRequest):
 
 @router.post("/review")
 def review(request: ReviewRequest):
+    explanation = None
+    grammar = None
+    sentence = None
+    analysis = None
 
     try:
+        explanation = explain_text(text=request.translated)
+    except Exception as e:
+        traceback.print_exc()
+        explanation = None
 
-        explanation = explain_text(
-            text=request.translated
-        )
+    try:
+        grammar = grammar_review(text=request.translated)
+    except Exception as e:
+        traceback.print_exc()
+        grammar = None
 
+    try:
+        sentence = english_sentence(word=request.translated)
+    except Exception as e:
+        traceback.print_exc()
+        sentence = None
 
-        grammar = grammar_review(
-            text=request.translated
-        )
-
-
-        sentence = english_sentence(
-            word=request.translated
-        )
-
-
+    try:
         analysis = review_contribution(
             language=request.language,
             contribution_type=request.contribution_type,
             source=request.source,
             translation=request.translated,
         )
-
-
-        return {
-
-            "explanation": explanation.explanation,
-
-
-            "grammar": grammar.corrected_text if grammar and grammar.corrected_text else "No correction" ,
-
-
-            "example_sentence": sentence.sentence,
-
-
-            "review": {
-
-                "confidence": analysis.confidence,
-
-                "summary": analysis.summary
-
-            }
-
-        }
-
-
     except Exception as e:
-        traceback.print_exc() 
+        traceback.print_exc()
+        analysis = None
 
-        raise HTTPException(
-            status_code=500,
-            detail=f"AI review failed: {str(e)}"
-        )
+    return {
+        "explanation": getattr(explanation, "explanation", "Unable to generate explanation."),
+        "grammar": getattr(grammar, "corrected_text", None) or "No correction",
+        "example_sentence": getattr(sentence, "sentence", "Unable to generate example sentence."),
+        "review": {
+            "confidence": getattr(analysis, "confidence", "unknown"),
+            "summary": getattr(analysis, "summary", "Unable to generate review summary."),
+        },
+    }
